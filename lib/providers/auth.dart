@@ -1,11 +1,10 @@
-import 'dart:async';
 import 'dart:convert';
 
 import 'package:authmodule/model/httpexception.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
-class Auth with ChangeNotifier {
+class Auth extends ChangeNotifier {
   String? _tokenId;
   DateTime? _expiryDate;
   String? _userId;
@@ -13,11 +12,10 @@ class Auth with ChangeNotifier {
   bool get isAuth => token != null;
 
   get token {
-    if (_tokenId != null && _expiryDate != null) {
-      if (_expiryDate!.isAfter(DateTime.now())) {
-        print(_tokenId);
-        return _tokenId;
-      }
+    if (_tokenId != null &&
+        _expiryDate != null &&
+        _expiryDate!.isAfter(DateTime.now())) {
+      return _tokenId;
     }
     return null;
   }
@@ -35,20 +33,16 @@ class Auth with ChangeNotifier {
             'password': password,
             'returnSecureToken': true
           }));
-      // if (kDebugMode) {
-      //   print(response.body.toString());
-      // }
 
       if (response.statusCode == 200) {
         var result = jsonDecode(response.body);
-        // print(response.body.toString());
         _tokenId = result['idToken'];
+        // if (kDebugMode) {
+        //   print(_tokenId);
+        // }
         _expiryDate = DateTime.now()
             .add(Duration(seconds: int.parse(result['expiresIn'])));
         _userId = result['localId'];
-        // if (kDebugMode) {
-        //   print('tokenid $_tokenId  expiry data  $_expiryDate user  $_userId');
-        // }
 
         if (result['error'] != null) {
           throw HttpException(result['error']['message']);

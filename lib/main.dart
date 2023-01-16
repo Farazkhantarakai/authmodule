@@ -23,11 +23,7 @@ class _HomeAppState extends State<HomeApp> {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-        providers: [
-          ChangeNotifierProvider<Auth>(create: (context) {
-            return Auth();
-          })
-        ],
+        providers: [ChangeNotifierProvider.value(value: Auth())],
         child: MaterialApp(
           routes: {
             LogInScreen.routName: ((context) {
@@ -37,13 +33,11 @@ class _HomeAppState extends State<HomeApp> {
               return const SignUpScreen();
             })
           },
-          home: Consumer<String?>(builder: (context, token, child) {
+          home: Consumer<Auth>(builder: (context, auth, child) {
             if (kDebugMode) {
-              print(token);
+              print(auth.isAuth);
             }
-            return token != null
-                ? const HomeScreen()
-                : const GetStartedScreen();
+            return auth.isAuth ? const HomeScreen() : const GetStartedScreen();
           }),
         ));
   }
